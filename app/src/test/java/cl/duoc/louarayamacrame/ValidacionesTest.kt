@@ -86,4 +86,39 @@ class ValidacionesTest {
             )
         )
     }
+
+    @Test
+    fun nombreConSoloEspaciosEsInvalido() {
+        assertFalse(
+            Validaciones.nombreValido("   ")
+        )
+    }
+
+    @Test
+    fun correoSinDominioEsInvalido() {
+        assertFalse(
+            Validaciones.correoValido("usuario@")
+        )
+    }
+
+    @Test
+    fun correoConEspaciosExternosEsValido() {
+        assertTrue(
+            Validaciones.correoValido("  prueba@gmail.com  ")
+        )
+    }
+
+    @Test
+    fun contrasenaRegistroDeOchoCaracteresEsValida() {
+        assertTrue(
+            Validaciones.contrasenaRegistroValida("12345678")
+        )
+    }
+
+    @Test
+    fun contrasenasVaciasNoCoinciden() {
+        assertFalse(
+            Validaciones.contrasenasCoinciden("", "")
+        )
+    }
 }

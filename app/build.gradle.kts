@@ -63,5 +63,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     ksp(libs.androidx.room.compiler)
 }

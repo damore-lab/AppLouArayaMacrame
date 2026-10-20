@@ -68,6 +68,7 @@ fun RegistroScreen(
             value = nombre,
             onValueChange = viewModel::actualizarNombre,
             label = { Text("Nombre completo") },
+            leadingIcon = { Text("♙") },
             singleLine = true,
             isError = errorNombre.isNotEmpty(),
             supportingText = {
@@ -85,6 +86,7 @@ fun RegistroScreen(
             value = alias,
             onValueChange = viewModel::actualizarAlias,
             label = { Text("Alias de usuario") },
+            leadingIcon = { Text("@") },
             singleLine = true,
             isError = errorAlias.isNotEmpty(),
             supportingText = {
@@ -102,6 +104,7 @@ fun RegistroScreen(
             value = correo,
             onValueChange = viewModel::actualizarCorreo,
             label = { Text("Correo electrónico") },
+            leadingIcon = { Text("✉") },
             singleLine = true,
             isError = errorCorreo.isNotEmpty(),
             supportingText = {
@@ -121,6 +124,7 @@ fun RegistroScreen(
             value = contrasena,
             onValueChange = viewModel::actualizarContrasena,
             label = { Text("Contraseña") },
+            leadingIcon = { Text("🔒") },
             singleLine = true,
             isError = errorContrasena.isNotEmpty(),
             supportingText = {
@@ -157,6 +161,7 @@ fun RegistroScreen(
             value = confirmacion,
             onValueChange = viewModel::actualizarConfirmacion,
             label = { Text("Confirmar contraseña") },
+            leadingIcon = { Text("🔒") },
             singleLine = true,
             isError = errorConfirmacion.isNotEmpty(),
             supportingText = {

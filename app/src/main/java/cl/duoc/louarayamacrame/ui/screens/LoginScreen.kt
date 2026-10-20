@@ -59,6 +59,7 @@ fun LoginScreen(
             value = correo,
             onValueChange = viewModel::actualizarCorreo,
             label = { Text("Correo electrónico") },
+            leadingIcon = { Text("✉") },
             singleLine = true,
             isError = errorCorreo.isNotEmpty(),
             supportingText = {
@@ -78,6 +79,7 @@ fun LoginScreen(
             value = contrasena,
             onValueChange = viewModel::actualizarContrasena,
             label = { Text("Contraseña") },
+            leadingIcon = { Text("🔒") },
             singleLine = true,
             isError = errorContrasena.isNotEmpty(),
             supportingText = {
