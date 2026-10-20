@@ -4,11 +4,35 @@ import androidx.lifecycle.ViewModel
 import cl.duoc.louarayamacrame.validation.Validaciones
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import cl.duoc.louarayamacrame.data.UsuarioDao
+import cl.duoc.louarayamacrame.data.UsuarioEntity
+import cl.duoc.louarayamacrame.data.SeguridadContrasena
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegistroViewModel : ViewModel() {
 
+    private var usuarioDao: UsuarioDao? = null
+
+    fun configurarDao(dao: UsuarioDao) {
+        usuarioDao = dao
+    }
+
     private val _nombre = MutableStateFlow("")
     val nombre = _nombre.asStateFlow()
+    private val _alias = MutableStateFlow("")
+    val alias = _alias.asStateFlow()
+
+    private val _errorAlias = MutableStateFlow("")
+    val errorAlias = _errorAlias.asStateFlow()
+
+    fun actualizarAlias(valor: String) {
+        _alias.value = valor
+        _errorAlias.value = ""
+        _mensaje.value = ""
+    }
 
     private val _correo = MutableStateFlow("")
     val correo = _correo.asStateFlow()
@@ -63,6 +87,7 @@ class RegistroViewModel : ViewModel() {
 
         _errorNombre.value = ""
         _errorCorreo.value = ""
+        _errorAlias.value = ""
         _errorContrasena.value = ""
         _errorConfirmacion.value = ""
         _mensaje.value = ""
@@ -70,19 +95,16 @@ class RegistroViewModel : ViewModel() {
         val nombreIngresado = _nombre.value.trim()
         val correoIngresado = _correo.value.trim()
 
-        // Validación del nombre
         if (!Validaciones.nombreValido(nombreIngresado)) {
             _errorNombre.value = "El nombre es obligatorio"
         }
 
-        // Validación del correo
         if (correoIngresado.isEmpty()) {
             _errorCorreo.value = "El correo es obligatorio"
         } else if (!Validaciones.correoValido(correoIngresado)) {
             _errorCorreo.value = "Ingresa un correo válido"
         }
 
-        // Validación de la contraseña
         if (_contrasena.value.isEmpty()) {
             _errorContrasena.value = "La contraseña es obligatoria"
         } else if (!Validaciones.contrasenaRegistroValida(_contrasena.value)) {
@@ -90,7 +112,6 @@ class RegistroViewModel : ViewModel() {
                 "La contraseña debe tener al menos 8 caracteres"
         }
 
-        // Validación de confirmación
         if (_confirmacion.value.isEmpty()) {
             _errorConfirmacion.value =
                 "Debes confirmar tu contraseña"
@@ -103,7 +124,12 @@ class RegistroViewModel : ViewModel() {
                 "Las contraseñas no coinciden"
         }
 
+        if (_alias.value.trim().length < 3) {
+            _errorAlias.value = "El alias debe tener al menos 3 caracteres"
+        }
+
         val esValido = _errorNombre.value.isEmpty() &&
+                _errorAlias.value.isEmpty() &&
                 _errorCorreo.value.isEmpty() &&
                 _errorContrasena.value.isEmpty() &&
                 _errorConfirmacion.value.isEmpty()
@@ -114,5 +140,68 @@ class RegistroViewModel : ViewModel() {
         }
 
         return esValido
+    }
+
+    fun registrarUsuario() {
+        if (!validarFormulario()) return
+
+        val dao = usuarioDao ?: run {
+            _mensaje.value = "No se pudo acceder a la base de datos"
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val correoNormalizado = _correo.value.trim().lowercase()
+
+                val existente = withContext(Dispatchers.IO) {
+                    dao.buscarPorCorreo(correoNormalizado)
+                }
+
+                if (existente != null) {
+                    _errorCorreo.value = "Este correo ya está registrado"
+                    _mensaje.value = ""
+                    return@launch
+                }
+
+                val aliasIngresado = _alias.value.trim()
+
+                val aliasExistente = withContext(Dispatchers.IO) {
+                    dao.buscarPorAlias(aliasIngresado)
+                }
+
+                if (aliasExistente != null) {
+                    _errorAlias.value = "Este alias ya está registrado"
+                    _mensaje.value = ""
+                    return@launch
+                }
+
+                val salt = withContext(Dispatchers.Default) {
+                    SeguridadContrasena.generarSalt()
+                }
+
+                val hash = withContext(Dispatchers.Default) {
+                    SeguridadContrasena.generarHash(_contrasena.value, salt)
+                }
+
+                val usuario = UsuarioEntity(
+                    nombre = _nombre.value.trim(),
+                    alias = _alias.value.trim(),
+                    correo = correoNormalizado,
+                    contrasenaHash = hash,
+                    contrasenaSalt = salt,
+                    rol = "CLIENTE"
+                )
+
+                withContext(Dispatchers.IO) {
+                    dao.insertarUsuario(usuario)
+                }
+
+                _mensaje.value = "Usuario registrado correctamente"
+
+            } catch (e: Exception) {
+                _mensaje.value = "No se pudo completar el registro"
+            }
+        }
     }
 }

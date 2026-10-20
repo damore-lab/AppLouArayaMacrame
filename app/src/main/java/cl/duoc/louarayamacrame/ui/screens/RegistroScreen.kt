@@ -25,6 +25,8 @@ fun RegistroScreen(
 ) {
 
     val nombre by viewModel.nombre.collectAsStateWithLifecycle()
+    val alias by viewModel.alias.collectAsStateWithLifecycle()
+    val errorAlias by viewModel.errorAlias.collectAsStateWithLifecycle()
     val correo by viewModel.correo.collectAsStateWithLifecycle()
     val contrasena by viewModel.contrasena.collectAsStateWithLifecycle()
     val confirmacion by viewModel.confirmacion.collectAsStateWithLifecycle()
@@ -77,6 +79,24 @@ fun RegistroScreen(
         )
 
         Spacer(Modifier.height(12.dp))
+
+
+        OutlinedTextField(
+            value = alias,
+            onValueChange = viewModel::actualizarAlias,
+            label = { Text("Alias de usuario") },
+            singleLine = true,
+            isError = errorAlias.isNotEmpty(),
+            supportingText = {
+                if (errorAlias.isNotEmpty()) {
+                    Text(errorAlias)
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(12.dp))
+
 
         OutlinedTextField(
             value = correo,
@@ -171,7 +191,7 @@ fun RegistroScreen(
 
         Button(
             onClick = {
-                viewModel.validarFormulario()
+                viewModel.registrarUsuario()
             },
             modifier = Modifier.fillMaxWidth()
         ) {

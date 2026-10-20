@@ -19,13 +19,20 @@ import cl.duoc.louarayamacrame.viewmodel.LoginViewModel
 fun LoginScreen(
     viewModel: LoginViewModel,
     onRegistro: () -> Unit,
-    onVolver: () -> Unit
+    onVolver: () -> Unit,
+    onLoginExitoso: () -> Unit
 ) {
     val correo by viewModel.correo.collectAsStateWithLifecycle()
     val contrasena by viewModel.contrasena.collectAsStateWithLifecycle()
     val errorCorreo by viewModel.errorCorreo.collectAsStateWithLifecycle()
     val errorContrasena by viewModel.errorContrasena.collectAsStateWithLifecycle()
     val mensaje by viewModel.mensaje.collectAsStateWithLifecycle()
+
+    LaunchedEffect(mensaje) {
+        if (mensaje == "Inicio de sesión correcto") {
+            onLoginExitoso()
+        }
+    }
 
     var mostrarContrasena by rememberSaveable {
         mutableStateOf(false)
@@ -102,7 +109,7 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                viewModel.validarFormulario()
+                viewModel.iniciarSesion()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
