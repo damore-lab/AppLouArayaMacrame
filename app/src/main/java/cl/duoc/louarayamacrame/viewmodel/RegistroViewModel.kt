@@ -12,6 +12,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/* revisar start
+        Puntos 2 y 3: publicar progreso y resultado del registro y evitar inserciones
+        simultáneas. Tomar una copia coherente de los campos antes del trabajo asíncrono.
+        Puntos 8 y 15: usar repositorio local, centralizar las reglas compartidas
+        de alias y gestionar el avatar seleccionado junto con los datos del perfil.
+ */
 class RegistroViewModel : ViewModel() {
 
     private var usuarioDao: UsuarioDao? = null
@@ -205,3 +211,4 @@ class RegistroViewModel : ViewModel() {
         }
     }
 }
+//revisar end

@@ -6,6 +6,14 @@ import cl.duoc.louarayamacrame.data.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+/* revisar start
+        Punto 8: separar catálogo, formularios, solicitudes y campañas por responsabilidad,
+        compartir repositorios locales y exponer StateFlow de solo lectura.
+        Puntos 1 y 5: recibir una sesión restaurada, limpiar datos al cerrar sesión
+        y verificar usuario y rol dentro de las operaciones, no solo en las pantallas.
+        Puntos 12, 14, 16 y 17: crear los componentes de lógica que faltan para
+        colecciones, avisos, eventos e historial QR; todos con persistencia local.
+ */
 class ComercioViewModel : ViewModel() {
     private var dao: ComercioDao? = null
     private val _mensaje = MutableStateFlow("")
@@ -17,6 +25,10 @@ class ComercioViewModel : ViewModel() {
     private var usuarioActual = -1
     private var favoritosJob: Job? = null
     private var solicitudesJob: Job? = null
+    /* revisar start
+            Puntos 8 y 19: llevar la carga inicial a la capa de datos e incluir imágenes
+            de ejemplo locales. Separar datos compartidos del estado de cada usuario.
+     */
     fun configurar(database: AppDatabase, usuarioId: Int, admin: Boolean) {
         if (dao == null) {
             dao = database.comercioDao()
@@ -89,6 +101,8 @@ class ComercioViewModel : ViewModel() {
         }
     }
 
+    //revisar end
+
     fun limpiarMensaje() {
         _mensaje.value = ""
     }
@@ -99,6 +113,14 @@ class ComercioViewModel : ViewModel() {
         else d.agregarFavorito(FavoritoEntity(usuarioId, productoId))
     }
 
+    /* revisar start
+            Puntos 2, 3 y 5: publicar estado de guardado y un resultado de éxito o error,
+            bloquear operaciones repetidas y comprobar permisos antes de escribir.
+            Punto 4: desactivar sin confundir con trabajo a pedido; impedir que una
+            eliminación deje solicitudes sin información histórica del producto.
+            Puntos 13, 14 y 18: validar vigencia y transiciones de estado y generar
+            avisos locales por usuario dentro de una operación coherente en Room.
+     */
     fun guardarProducto(item: ProductoEntity) = ejecutar {
         val d = dao ?: return@ejecutar
         if (item.id == 0) d.crearProducto(item) else d.editarProducto(item)
@@ -130,6 +152,13 @@ class ComercioViewModel : ViewModel() {
         _mensaje.value = "Campaña guardada"
     }
 
+    //revisar end
+
+    /* revisar start
+            Puntos 2 y 3: propagar el resultado de la operación al formulario y liberar
+            el estado de guardado incluso ante error. No anunciar éxito si el DAO
+            todavía no está disponible o si no se realizó ninguna escritura.
+     */
     private fun ejecutar(accion: suspend () -> Unit) {
         viewModelScope.launch {
             try {
@@ -139,4 +168,6 @@ class ComercioViewModel : ViewModel() {
             }
         }
     }
+    //revisar end
 }
+//revisar end

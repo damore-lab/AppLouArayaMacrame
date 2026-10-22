@@ -67,6 +67,11 @@ import cl.duoc.louarayamacrame.validation.ValidacionesComercio
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import java.io.File
 
+/* revisar start
+        Puntos 9, 11 y 22: extraer componentes comunes y separar las pantallas por
+        funcionalidad. Compartir navegación y revisar teclado, texto grande, etiquetas
+        accesibles y espacios del sistema en todos los tamaños de pantalla.
+ */
 @Composable
 fun Encabezado(titulo: String, volver: () -> Unit, contenido: @Composable ColumnScope.() -> Unit) {
     Column(
@@ -88,6 +93,12 @@ fun Encabezado(titulo: String, volver: () -> Unit, contenido: @Composable Column
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 4, 5 y 11: distinguir producto inactivo de trabajo a pedido y ofrecer
+        favoritos solo al rol correspondiente, con descripción accesible de la acción.
+ */
 @Composable
 fun TarjetaProducto(
     item: ProductoEntity,
@@ -120,6 +131,12 @@ fun TarjetaProducto(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Punto 19: admitir fotografías locales de demostración y manejar imágenes
+        ausentes o dañadas. Evitar decodificar archivos grandes en el hilo de interfaz.
+ */
 @Composable
 fun ImagenProducto(ruta: String?, modifier: Modifier = Modifier) {
     val bitmap = remember(ruta) {
@@ -148,6 +165,13 @@ fun ImagenProducto(ruta: String?, modifier: Modifier = Modifier) {
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 9, 10, 12 y 19: mostrar colecciones destacadas y diseños nuevos,
+        mantener accesos por rol y una barra compartida con destino seleccionado.
+        Añadir retroalimentación animada útil sin depender solo de esta bienvenida.
+ */
 @Composable
 fun DashboardScreen(nombre: String, admin: Boolean, abrir: (String) -> Unit) {
     var mostrar by remember { mutableStateOf(false) }
@@ -229,6 +253,13 @@ fun DashboardScreen(nombre: String, admin: Boolean, abrir: (String) -> Unit) {
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 1, 4, 9 y 12: conservar búsqueda y filtros al regresar y al recrear
+        la actividad, filtrar productos inactivos para clientes e incorporar colecciones.
+        El estado y los filtros deben coordinarse con el ViewModel del catálogo.
+ */
 @Composable
 fun CatalogoScreen(
     productos: List<ProductoEntity>,
@@ -278,6 +309,13 @@ fun CatalogoScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 1, 4 y 5: recuperar el producto mediante un ID restaurable de la ruta;
+        distinguir carga de producto inexistente. Mostrar acciones según rol y estado:
+        el administrador no debe ver un botón de cotización que no realiza nada.
+ */
 @Composable
 fun DetalleScreen(
     item: ProductoEntity?,
@@ -324,6 +362,16 @@ fun DetalleScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 1 y 8: mover borrador, validaciones y errores al ViewModel del formulario
+        y definir restauración del borrador y del producto asociado por usuario.
+        Puntos 2 y 3: mostrar progreso, impedir envíos repetidos y conservar campos
+        ante fallos; navegar solo tras un resultado de guardado confirmado.
+        Puntos 6, 7, 10 y 11: errores e íconos accesibles por campo, fecha marcada
+        como inválida aunque tenga texto, medidas válidas y confirmación animada.
+ */
 @Composable
 fun CotizacionScreen(
     usuarioId: Int,
@@ -397,6 +445,14 @@ fun CotizacionScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 4 y 18: mostrar producto histórico, fecha de creación, total acordado
+        y cliente ficticio para administración; definir los estados y sus transiciones.
+        Puntos 2, 3, 5 y 10: verificar rol en la lógica, bloquear cambios repetidos
+        mientras se guardan y confirmar visualmente solo los cambios exitosos.
+ */
 @Composable
 fun SolicitudesScreen(
     items: List<SolicitudEntity>,
@@ -441,6 +497,15 @@ fun SolicitudesScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 1, 6, 7 y 8: mover borrador y errores por campo a un ViewModel,
+        restaurarlos y validar dimensiones y precio, incluyendo cero y desbordamiento.
+        Puntos 2 y 3: mantener el editor abierto hasta confirmar el guardado en Room
+        y bloquear otro envío. Punto 4: separar desactivar de disponible o a pedido
+        y proteger el historial antes de permitir una eliminación definitiva.
+ */
 @Composable
 fun ProductosAdminScreen(
     productos: List<ProductoEntity>,
@@ -460,6 +525,12 @@ fun ProductosAdminScreen(
     var imagen by remember(editando) { mutableStateOf(editando?.imagenUri) }
     var errores by remember { mutableStateOf(false) }
     var confirmarEliminacion by remember { mutableStateOf(false) }
+    /* revisar start
+            Puntos 19 y 21: capturar una fotografía de calidad suficiente, manejar
+            cancelación, ausencia de cámara y errores de escritura sin cerrar la app.
+            Limpiar archivos nuevos al cancelar y reemplazos sin uso tras guardar,
+            sin borrar imágenes todavía referenciadas por productos o borradores.
+     */
     val camara =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { foto: Bitmap? ->
             if (foto != null) {
@@ -468,6 +539,7 @@ fun ProductosAdminScreen(
                 imagen = archivo.absolutePath
             }
         }
+    //revisar end
     Encabezado("Gestión de productos", volver) {
         if (editando == null) {
             Button(onClick = {
@@ -618,6 +690,17 @@ fun ProductosAdminScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 1, 6, 7 y 8: restaurar borrador y mover validación a un ViewModel;
+        mostrar errores por campo e inicio y término válidos, con íconos accesibles.
+        Puntos 2 y 3: cerrar el editor únicamente al confirmar el guardado y bloquear
+        pulsaciones repetidas. Punto 12: separar gestión de colecciones y asociaciones.
+        Punto 13: asociar diseños o colecciones y aplicar vigencia, no solo activa.
+        Punto 14: separar esta lista del centro de avisos por usuario, con leídos,
+        pendientes y apertura del destino relacionado, todo guardado localmente.
+ */
 @Composable
 fun CampanasScreen(
     campanas: List<CampanaEntity>,
@@ -702,6 +785,15 @@ fun CampanasScreen(
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 8 y 16: representar ferias y showrooms como eventos locales con nombre,
+        fecha, descripción y coordenadas en Room; observarlos desde un ViewModel e
+        incorporar mapa con marcadores seleccionables dentro de la app.
+        Punto 21: verificar permisos denegados, proveedores y ubicación ausente;
+        mostrar un mensaje si no se puede abrir una aplicación externa de mapas.
+ */
 @Composable
 fun MapaFeriasScreen(volver: () -> Unit) {
     val context = LocalContext.current
@@ -778,6 +870,15 @@ fun MapaFeriasScreen(volver: () -> Unit) {
     }
 }
 
+//revisar end
+
+/* revisar start
+        Puntos 8 y 17: validar explícitamente el formato del QR, admitir productos
+        y colecciones y registrar el acceso por usuario en Room antes de navegar.
+        Consultar existencia mediante lógica separada de la pantalla.
+        Punto 21: verificar lectura sin preparación de red adicional, cancelación,
+        errores y disponibilidad de Google Play Services en el dispositivo de entrega.
+ */
 @Composable
 fun EscanerQRScreen(abrirProducto: (Int) -> Unit, volver: () -> Unit) {
     val context = LocalContext.current
@@ -800,3 +901,4 @@ fun EscanerQRScreen(abrirProducto: (Int) -> Unit, volver: () -> Unit) {
         Spacer(Modifier.height(12.dp)); Text(mensaje)
     }
 }
+//revisar end

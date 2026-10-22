@@ -5,6 +5,15 @@ import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/* revisar start
+        Puntos 4, 12, 13, 14, 15, 16, 17 y 18: registrar las entidades y DAO nuevos
+        de colecciones, asociaciones, avisos, preferencias, eventos e historial QR.
+        Incrementar la versión y crear migraciones que conserven los usuarios,
+        productos y solicitudes actuales al agregar o transformar campos.
+        Puntos 1 y 8: ubicar la inicialización de datos de demostración en la capa
+        de datos y definir almacenamiento local de sesión según su duración prevista.
+        El estado de sesión no debe depender de variables remember de navegación.
+ */
 @Database(
     entities = [UsuarioEntity::class, ProductoEntity::class, FavoritoEntity::class,
         SolicitudEntity::class, CampanaEntity::class], version = 2, exportSchema = false
@@ -33,3 +42,4 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
+//revisar end

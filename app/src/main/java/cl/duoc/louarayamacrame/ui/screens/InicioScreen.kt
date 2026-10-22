@@ -8,6 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/* revisar start
+        Puntos 10 y 19: incorporar una bienvenida animada breve con imágenes locales
+        representativas de los diseños. Punto 11: comprobar desplazamiento y botones
+        con texto grande y pantallas pequeñas, manteniendo accesibles los dos accesos.
+ */
 @Composable
 fun InicioScreen(
     onLogin: () -> Unit,
@@ -49,3 +54,4 @@ fun InicioScreen(
         }
     }
 }
+//revisar end

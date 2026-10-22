@@ -23,7 +23,7 @@ private val ColoresMacrame = lightColorScheme(
 
     outline = Color(0xFF795548),
 
-    error = Color(0xFFB3261E),
+    error = Color(0xFFB42B22),
     onError = Color.White
 )
 

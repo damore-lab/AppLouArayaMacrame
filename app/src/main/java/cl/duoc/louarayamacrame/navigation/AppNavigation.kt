@@ -21,9 +21,13 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
     val database = remember(context) { AppDatabase.obtenerBaseDatos(context) }
+    /* revisar start
+            los valores pueden no quedar guardados o no restaurarse y generar errores.
+     */
     var usuarioAutenticadoId by remember { mutableStateOf<Int?>(null) }
     var usuario by remember { mutableStateOf<UsuarioEntity?>(null) }
     var productoSeleccionado by remember { mutableIntStateOf(0) }
+    //revisar end
     val comercio: ComercioViewModel = viewModel()
     val productos by comercio.productos.collectAsStateWithLifecycle()
     val favoritos by comercio.favoritos.collectAsStateWithLifecycle()
@@ -31,6 +35,11 @@ fun AppNavigation() {
     val campanas by comercio.campanas.collectAsStateWithLifecycle()
     val mensaje by comercio.mensaje.collectAsStateWithLifecycle()
 
+    /* revisar start
+            Punto 8: trasladar la creación del administrador de demostración a la capa
+            de datos y la carga del usuario a un componente de sesión. La navegación
+            debe observar el estado de sesión, sin consultar ni inicializar usuarios.
+     */
     LaunchedEffect(database) {
         withContext(Dispatchers.IO) {
             val dao = database.usuarioDao()
@@ -61,10 +70,16 @@ fun AppNavigation() {
             else comercio.configurar(database, id, usuario!!.rol == "ADMIN")
         } else usuario = null
     }
+    //revisar end
     fun ir(ruta: String) {
         navController.navigate(ruta) { launchSingleTop = true }
     }
 
+    /* revisar start
+            Puntos 1 y 5: al salir, limpiar sesión y estado del usuario anterior.
+            Al restaurar la app, comprobar la sesión y el rol antes de mostrar
+            cualquier destino protegido; evitar pantallas vacías si no hay usuario.
+     */
     fun salir() {
         usuarioAutenticadoId = null
         navController.navigate(Rutas.LOGIN) {
@@ -73,6 +88,15 @@ fun AppNavigation() {
         }
     }
 
+    //revisar end
+
+    /* revisar start
+            Puntos 1, 5 y 9: centralizar todas las rutas en Rutas.kt y pasar los ID
+            de producto como argumentos restaurables. Compartir la barra de navegación
+            entre secciones, indicando el destino seleccionado y respetando el rol.
+            Puntos 12, 14, 16 y 17: incorporar destinos locales para colecciones,
+            notificaciones, eventos y consultas desde QR; aún no tienen rutas propias.
+     */
     NavHost(navController = navController, startDestination = Rutas.BIENVENIDA) {
         composable(Rutas.BIENVENIDA) {
             InicioScreen(onLogin = { ir(Rutas.LOGIN) }, onRegistro = { ir(Rutas.REGISTRO) })
@@ -168,7 +192,13 @@ fun AppNavigation() {
             if (usuario != null && usuario!!.rol != "ADMIN") CotizacionScreen(
                 usuario!!.id,
                 productoSeleccionado.takeIf { it > 0 },
+                /* revisar start
+                        Puntos 2 y 3: navegar solo tras confirmar el guardado en Room.
+                        Mientras se guarda, bloquear otro envío; ante error, mantener
+                        la cotización abierta con sus datos y permitir reintentar.
+                 */
                 { comercio.solicitar(it); ir("solicitudes") },
+                //revisar end
                 { navController.popBackStack() })
         }
         composable("solicitudes") {
@@ -207,6 +237,7 @@ fun AppNavigation() {
             }, { navController.popBackStack() })
         }
     }
+    //revisar end
     if (mensaje.isNotBlank()) AlertDialog(
         onDismissRequest = { comercio.limpiarMensaje() },
         title = { Text("Lou Araya Macramé") },

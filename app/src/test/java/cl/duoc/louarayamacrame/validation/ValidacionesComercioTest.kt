@@ -5,6 +5,12 @@ import org.junit.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/* revisar start
+        Puntos 6, 7 y 20: ampliar casos de dimensiones y unidades inválidas, precio
+        fuera de rango, error por campo y períodos de campañas invertidos o inválidos.
+        Añadir en archivos propios pruebas de ViewModels con fallos de guardado,
+        doble envío, permisos por rol y transiciones de estado; no limitarse a validar textos.
+ */
 class ValidacionesComercioTest {
     @Test
     fun productoRequierePrecioPositivo() {
@@ -119,3 +125,4 @@ class ValidacionesComercioTest {
         )
     }
 }
+//revisar end

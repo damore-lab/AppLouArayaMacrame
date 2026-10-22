@@ -42,6 +42,12 @@ android {
     }
 }
 
+/* revisar start
+        Puntos 16 y 19: agregar solo las dependencias necesarias para el mapa integrado
+        y las imágenes locales según la solución elegida. Punto 20: incorporar soporte
+        de pruebas de corrutinas, ViewModels y Room si los nuevos casos lo requieren.
+        Mantener este alcance local, sin incorporar Retrofit ni servicios de backend.
+ */
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -66,3 +72,4 @@ dependencies {
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     ksp(libs.androidx.room.compiler)
 }
+//revisar end

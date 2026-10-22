@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/* revisar start
+        Puntos 1, 6 y 8: mantener borrador restaurable por usuario y errores por campo,
+        incluido nombre; compartir reglas de alias con registro y usar repositorio local.
+        Puntos 2 y 3: publicar progreso y resultado explícitos y bloquear guardados
+        simultáneos. Punto 15: guardar avatar y preferencias del usuario activo.
+ */
 class PerfilViewModel : ViewModel() {
 
     private val _mensaje = MutableStateFlow("")
@@ -74,3 +80,4 @@ class PerfilViewModel : ViewModel() {
         }
     }
 }
+//revisar end

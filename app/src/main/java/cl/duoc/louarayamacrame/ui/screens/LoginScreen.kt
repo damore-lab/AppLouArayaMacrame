@@ -15,6 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.duoc.louarayamacrame.viewmodel.LoginViewModel
 
+/* revisar start
+        Puntos 2 y 3: observar un estado de autenticación en curso y deshabilitar
+        Ingresar hasta obtener resultado, conservando los campos cuando haya error.
+        Puntos 8 y 9: reaccionar a un resultado de autenticación explícito,
+        sin usar el texto del mensaje como señal para navegar.
+        Punto 11: permitir desplazamiento con teclado y texto grande y usar
+        íconos con etiquetas accesibles; comprobarlo en pantalla pequeña.
+ */
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
@@ -138,3 +146,4 @@ fun LoginScreen(
         }
     }
 }
+//revisar end

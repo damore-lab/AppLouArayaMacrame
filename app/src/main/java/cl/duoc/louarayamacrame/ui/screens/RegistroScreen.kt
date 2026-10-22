@@ -18,6 +18,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.duoc.louarayamacrame.viewmodel.RegistroViewModel
 
+/* revisar start
+        Puntos 2 y 3: observar progreso, bloquear registros repetidos y finalizar
+        el formulario solo cuando el ViewModel confirme el guardado del usuario.
+        Puntos 11 y 15: usar íconos accesibles e incorporar selección de avatar,
+        conservando la selección durante recreaciones del formulario.
+ */
 @Composable
 fun RegistroScreen(
     viewModel: RegistroViewModel,
@@ -226,3 +232,4 @@ fun RegistroScreen(
         }
     }
 }
+//revisar end

@@ -11,6 +11,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/* revisar start
+        Puntos 1 y 8: delegar datos a un repositorio local y comunicar autenticación
+        al componente de sesión; definir restauración sin persistir la contraseña.
+        Puntos 2 y 3: exponer progreso y resultado explícitos y bloquear intentos
+        simultáneos para que el formulario y la navegación respondan al resultado.
+ */
 class LoginViewModel : ViewModel() {
 
     private var usuarioDao: UsuarioDao? = null
@@ -123,3 +129,4 @@ class LoginViewModel : ViewModel() {
     }
 
 }
+//revisar end

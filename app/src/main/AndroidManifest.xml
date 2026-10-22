@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- revisar start
+            Puntos 14, 16, 19 y 21: al incorporar avisos del teléfono, mapa integrado
+            y captura de fotografías completas, declarar permisos y componentes
+            necesarios según la implementación elegida, incluido proveedor de archivos
+            si corresponde. Solicitar permisos en ejecución cuando aplique y probar
+            la denegación; no agregar permiso de cámara si la captura delegada no lo exige.
+    -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
@@ -27,4 +34,5 @@
         </activity>
     </application>
 
+    <!-- revisar end -->
 </manifest>

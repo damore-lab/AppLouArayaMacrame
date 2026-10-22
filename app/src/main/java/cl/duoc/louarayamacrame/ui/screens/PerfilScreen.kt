@@ -10,6 +10,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.duoc.louarayamacrame.data.UsuarioEntity
 import cl.duoc.louarayamacrame.viewmodel.PerfilViewModel
 
+/* revisar start
+        Puntos 1 y 8: gestionar el borrador de nombre y alias en el ViewModel con
+        restauración por usuario; no perder cambios sin guardar al recrear la actividad.
+        Puntos 2, 3 y 6: observar progreso, bloquear guardados repetidos y marcar
+        el error de nombre en su campo, con mensajes e íconos coherentes.
+        Puntos 9 y 11: añadir regreso visible, desplazamiento con teclado y texto grande.
+        Punto 15: editar avatar y preferencias de catálogo y avisos por usuario,
+        y consultar el estado actual de permisos de cámara y ubicación al sistema.
+ */
 @Composable
 fun PerfilScreen(
     usuario: UsuarioEntity,
@@ -113,3 +122,4 @@ fun PerfilScreen(
         }
     }
 }
+//revisar end

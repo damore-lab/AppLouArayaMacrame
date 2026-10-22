@@ -3,6 +3,13 @@ package cl.duoc.louarayamacrame.data
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+/* revisar start
+        Puntos 4 y 18: agregar desactivación y consultas que preserven la información
+        de productos en solicitudes; definir una política para eliminaciones relacionadas.
+        Puntos 12 y 13: consultar colecciones, productos asociados y campañas vigentes.
+        Puntos 14, 16 y 17: crear DAO propios para avisos, eventos y escaneos locales;
+        filtrar datos privados por usuario y mantener consistencia con transacciones.
+ */
 @Dao
 interface ComercioDao {
     @Query("SELECT * FROM productos ORDER BY id DESC")
@@ -46,3 +53,4 @@ interface ComercioDao {
     @Update
     suspend fun editarCampana(item: CampanaEntity)
 }
+//revisar end

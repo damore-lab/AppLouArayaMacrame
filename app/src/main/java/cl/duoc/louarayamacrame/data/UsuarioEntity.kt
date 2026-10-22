@@ -4,6 +4,12 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+/* revisar start
+        Punto 15: conectar avatarUri con selección y edición de avatar. Guardar
+        preferencias de catálogo y avisos por usuario, en campos o entidad relacionada,
+        con su migración. Los permisos del dispositivo se consultan al sistema;
+        no guardar una copia que pueda quedar desactualizada como estado definitivo.
+ */
 @Entity(
     tableName = "usuarios",
     indices = [
@@ -11,6 +17,7 @@ import androidx.room.PrimaryKey
         Index(value = ["alias"], unique = true)
     ]
 )
+//revisar end
 data class UsuarioEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
