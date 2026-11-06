@@ -1,10 +1,22 @@
 package cl.duoc.louarayamacrame.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.currentBackStackEntryAsState
+import cl.duoc.louarayamacrame.ui.components.BarraInferior
+import cl.duoc.louarayamacrame.ui.components.rutasConBarra
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -75,6 +87,15 @@ fun AppNavigation() {
         navController.navigate(ruta) { launchSingleTop = true }
     }
 
+    // Cambio entre secciones desde la barra inferior: vuelve al inicio y abre la sección elegida.
+    fun irBarra(ruta: String) {
+        navController.navigate(ruta) {
+            popUpTo("principal") { inclusive = false }
+            launchSingleTop = true
+        }
+    }
+    val rutaActual = navController.currentBackStackEntryAsState().value?.destination?.route
+
     /* revisar start
             Puntos 1 y 5: al salir, limpiar sesión y estado del usuario anterior.
             Al restaurar la app, comprobar la sesión y el rol antes de mostrar
@@ -97,7 +118,24 @@ fun AppNavigation() {
             Puntos 12, 14, 16 y 17: incorporar destinos locales para colecciones,
             notificaciones, eventos y consultas desde QR; aún no tienen rutas propias.
      */
-    NavHost(navController = navController, startDestination = Rutas.BIENVENIDA) {
+    val usuarioActual = usuario
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            if (usuarioActual != null && rutaActual in rutasConBarra) {
+                BarraInferior(rutaActual, usuarioActual.rol == "ADMIN") { irBarra(it) }
+            }
+        }
+    ) { relleno ->
+    NavHost(
+        navController = navController,
+        startDestination = Rutas.BIENVENIDA,
+        modifier = Modifier.padding(relleno),
+        enterTransition = { fadeIn(tween(260)) + slideInHorizontally(tween(260)) { it / 12 } },
+        exitTransition = { fadeOut(tween(180)) },
+        popEnterTransition = { fadeIn(tween(260)) },
+        popExitTransition = { fadeOut(tween(180)) + slideOutHorizontally(tween(260)) { it / 12 } }
+    ) {
         composable(Rutas.BIENVENIDA) {
             InicioScreen(onLogin = { ir(Rutas.LOGIN) }, onRegistro = { ir(Rutas.REGISTRO) })
         }
@@ -129,22 +167,29 @@ fun AppNavigation() {
             val actual = usuario
             if (actual == null) {
                 LaunchedEffect(usuarioAutenticadoId) { if (usuarioAutenticadoId == null) salir() }
-            } else DashboardScreen(actual.nombre, actual.rol == "ADMIN") { opcion ->
-                when (opcion) {
-                    "Catálogo" -> ir("catalogo")
-                    "Mis favoritos" -> ir("favoritos")
-                    "Solicitar cotización" -> {
-                        productoSeleccionado = 0; ir("cotizar")
-                    }
+            } else DashboardScreen(
+                nombre = actual.nombre,
+                admin = actual.rol == "ADMIN",
+                abrir = { opcion ->
+                    when (opcion) {
+                        "Catálogo" -> ir("catalogo")
+                        "Mis favoritos" -> ir("favoritos")
+                        "Solicitar cotización" -> {
+                            productoSeleccionado = 0; ir("cotizar")
+                        }
 
-                    "Mis solicitudes", "Solicitudes" -> ir("solicitudes")
-                    "Ferias y mapa" -> ir("mapa")
-                    "Escanear QR" -> ir("qr")
-                    "Perfil" -> ir(Rutas.PERFIL)
-                    "Productos" -> ir("productos_admin")
-                    "Campañas", "Notificaciones" -> ir(if (opcion == "Campañas") "campanas_admin" else "novedades")
-                }
-            }
+                        "Mis solicitudes", "Solicitudes" -> ir("solicitudes")
+                        "Ferias y mapa" -> ir("mapa")
+                        "Escanear QR" -> ir("qr")
+                        "Perfil" -> ir(Rutas.PERFIL)
+                        "Productos" -> ir("productos_admin")
+                        "Campañas", "Notificaciones" -> ir(if (opcion == "Campañas") "campanas_admin" else "novedades")
+                    }
+                },
+                campanas = campanas,
+                productos = productos,
+                abrirProducto = { productoSeleccionado = it; ir("detalle") }
+            )
         }
         composable(Rutas.PERFIL) {
             val actual = usuario
@@ -159,7 +204,8 @@ fun AppNavigation() {
                         database.usuarioDao()
                     ) { actualizado -> usuario = actualizado }
                 },
-                onCerrarSesion = { salir() })
+                onCerrarSesion = { salir() },
+                onVolver = { navController.popBackStack() })
             else LaunchedEffect(Unit) { ir(Rutas.LOGIN) }
         }
         composable("catalogo") {
@@ -186,7 +232,8 @@ fun AppNavigation() {
                 productoSeleccionado in favoritos,
                 { comercio.favorito(usuario!!.id, productoSeleccionado) },
                 { if (usuario!!.rol != "ADMIN") ir("cotizar") },
-                { navController.popBackStack() })
+                { navController.popBackStack() },
+                usuario!!.rol == "ADMIN")
         }
         composable("cotizar") {
             if (usuario != null && usuario!!.rol != "ADMIN") CotizacionScreen(
@@ -197,16 +244,24 @@ fun AppNavigation() {
                         Mientras se guarda, bloquear otro envío; ante error, mantener
                         la cotización abierta con sus datos y permitir reintentar.
                  */
-                { comercio.solicitar(it); ir("solicitudes") },
+                { comercio.solicitar(it) },
                 //revisar end
-                { navController.popBackStack() })
+                { navController.popBackStack() },
+                {
+                    // Tras la animación de confirmación se abre el historial de solicitudes.
+                    navController.navigate("solicitudes") {
+                        popUpTo("cotizar") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                })
         }
         composable("solicitudes") {
             if (usuario != null) SolicitudesScreen(
                 solicitudes,
                 usuario!!.rol == "ADMIN",
                 { id, estado -> comercio.cambiarEstado(id, estado) },
-                { navController.popBackStack() })
+                { navController.popBackStack() },
+                productos)
         }
         composable("productos_admin") {
             if (usuario?.rol == "ADMIN") ProductosAdminScreen(
@@ -224,10 +279,8 @@ fun AppNavigation() {
                 { navController.popBackStack() })
         }
         composable("novedades") {
-            if (usuario != null) CampanasScreen(
+            if (usuario != null) NotificacionesScreen(
                 campanas,
-                false,
-                {},
                 { navController.popBackStack() })
         }
         composable("mapa") { if (usuario != null) MapaFeriasScreen { navController.popBackStack() } }
@@ -237,8 +290,13 @@ fun AppNavigation() {
             }, { navController.popBackStack() })
         }
     }
+    }
     //revisar end
-    if (mensaje.isNotBlank()) AlertDialog(
+    // La confirmación de envío de una cotización ya se muestra con su propia animación.
+    LaunchedEffect(mensaje) {
+        if (mensaje == "Solicitud enviada correctamente") comercio.limpiarMensaje()
+    }
+    if (mensaje.isNotBlank() && mensaje != "Solicitud enviada correctamente") AlertDialog(
         onDismissRequest = { comercio.limpiarMensaje() },
         title = { Text("Lou Araya Macramé") },
         text = { Text(mensaje) },
